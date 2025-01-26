@@ -60,7 +60,7 @@ runcmd:
     # /home/gameshell/game_data/gameshell_wrapper.sh
     # This script serves as the login shell for user 'gameshell'.
     # It retrieves the environment variable GAMESHELL_LANG from /proc/1/environ
-    # via 'sudo /bin/cat', which is allowed by a sudoers rule.
+    # via 'sudo xargs -0 -L1 -a', which is allowed by a sudoers rule.
 
     # 1) Use sudo to read /proc/1/environ (only command allowed by our sudoers file).
     RAW_ENV="$(sudo xargs -0 -L1 -a /proc/1/environ 2>/dev/null || true)"
