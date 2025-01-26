@@ -1,0 +1,18 @@
+config:
+  environment.GAMESHELL_LANG: "fr"
+description: "Devices & config for GameShell containers"
+devices:
+  root:
+    type: disk
+    path: /
+    pool: default
+  gameshell-data:
+    type: disk
+    path: /home/gameshell/game_data
+    pool: default
+    source: gameshell-data
+  eth0:
+    type: nic
+    nictype: bridged
+    parent: incusbr0
+name: gameshell-profile

@@ -1,0 +1,43 @@
+
+#cloud-config
+
+disable_root: true
+chpasswd:
+  list: |
+    root:!
+  expire: false
+ssh_pwauth: false
+
+users:
+  - name: gameshell
+    homedir: /home/gameshell
+    gecos: "Gameshell User"
+    lock_passwd: false
+    shell: "/home/gameshell/game_data/gameshell_wrapper.sh"
+
+package_update: true
+package_upgrade: true
+packages:
+  - wget
+  - curl
+  - tar
+
+runcmd:
+  - sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen
+  - sed -i 's/^# *\(fr_FR.UTF-8\)/\1/' /etc/locale.gen
+  - locale-gen
+  - update-locale LANG=fr_FR.UTF-8
+
+  - mkdir -p /home/gameshell/game_data
+  - wget https://github.com/phyver/GameShell/releases/download/latest/gameshell.sh -O /home/gameshell/game_data/gameshell.sh
+  - chmod +x /home/gameshell/game_data/gameshell.sh
+
+  - |
+    cat << 'EOF' > /home/gameshell/game_data/gameshell_wrapper.sh
+    #!/usr/bin/env bash
+    echo "Launching GameShell with FR language..."
+    exec /home/gameshell/game_data/gameshell.sh -L fr
+    EOF
+  - chmod +x /home/gameshell/game_data/gameshell_wrapper.sh
+
+  - chown -R gameshell:gameshell /home/gameshell/
