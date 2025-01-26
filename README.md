@@ -24,7 +24,7 @@ This repository showcases how to:
   - Installs minimal packages required (e.g., `wget`, `curl`, `tar`).
   - Downloads the GameShell script from GitHub.
 
-- **(Optional) `profile.yml`**  
+- **`gameshell-profile.yml`**  
   An example Incus profile definition (devices only). You may or may not store this in Git—some prefer to create/edit profiles on-the-fly.
 
 - **`README.md`**  
