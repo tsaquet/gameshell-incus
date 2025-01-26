@@ -206,7 +206,7 @@ Feel free to open issues or PRs if you notice any improvements or bugs. The [Gam
 
 ## License
 
-[MIT License](LICENSE) (or whichever license you choose).
+[MIT License](LICENSE).
 
 ---
 
