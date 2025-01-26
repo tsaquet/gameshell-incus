@@ -141,7 +141,7 @@ This command overwrites (or sets) **only** the `user.user-data` key in the profi
 Pick a **cloud-init-capable** image such as `ubuntu:22.04`:
 
 ```bash
-incus launch launch images:ubuntu/24.04/cloud gameshell-container -p gameshell-profile
+incus launch images:ubuntu/24.04/cloud gameshell-container -p gameshell-profile
 ```
 
 Incus creates the container and boots it. Cloud-Init runs at first boot:
@@ -150,6 +150,12 @@ Incus creates the container and boots it. Cloud-Init runs at first boot:
 - The `gameshell.sh` script is downloaded to `/home/gameshell/game_data/`,  
 - A wrapper script sets the default language option,  
 - `root` is locked.
+
+You can see Cloud-init progress with this command to be sure it has finished :
+
+```bash
+incus exec gameshell-container -- cloud-init status --wait
+```
 
 ### 6. Verify and Log In
 
@@ -172,7 +178,7 @@ If you want to switch to English, you can either:
   incus profile set gameshell-profile environment.GAMESHELL_LANG en
   incus restart gameshell-container
   ```
-  Then adjust your wrapper script to read that variable, e.g.:
+  This is used by the wrapper script :
   ```bash
   exec /home/gameshell/game_data/gameshell.sh -L "${GAMESHELL_LANG:-fr}"
   ```
