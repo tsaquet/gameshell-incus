@@ -51,9 +51,17 @@ incus storage volume create default gameshell-data
 
 ### 3. Create an Incus Profile (Devices Only)
 
-You can create a new profile named `gameshell-profile` that **only** includes device definitions (network, storage) — **no** embedded Cloud-Init. There are two main ways to do this:
+You can create a new profile named `gameshell-profile` that **only** includes device definitions (network, storage) — **no** embedded Cloud-Init. Various options to do this:
 
-#### Option A: Command-line device additions
+#### Option A (recommended): Use the provided Yaml file
+
+```bash
+# Create (or overwrite) the profile using `gameshell-profile.yml`:
+incus profile create gameshell-profile
+incus profile edit gameshell-profile < gameshell-profile.yml
+```
+
+#### Option B: Command-line device additions
 
 ```bash
 # Create an empty profile
@@ -74,7 +82,7 @@ incus profile device add gameshell-profile eth0 nic \
   parent=incusbr0
 ```
 
-#### Option B: YAML editing
+#### Option C: YAML editing
 
 If you prefer manual editing:
 
@@ -105,14 +113,6 @@ name: gameshell-profile
 ```
 
 Then save and exit the editor.
-
-#### Option C: Use a Yaml file
-
-**Create (or overwrite) the profile using `gameshell-profile.yml`:**
-   ```bash
-   incus profile create gameshell-profile
-   incus profile edit gameshell-profile < gameshell-profile.yml
-   ```
 
 ### 4. Inject the Cloud-Init File into the Profile
 
@@ -178,7 +178,7 @@ If you want to switch to English, you can either:
   incus profile set gameshell-profile environment.GAMESHELL_LANG en
   incus restart gameshell-container
   ```
-  This is used by the wrapper script :
+  This is used by the wrapper script:
   ```bash
   exec /home/gameshell/game_data/gameshell.sh -L "${GAMESHELL_LANG:-fr}"
   ```
