@@ -21,22 +21,63 @@ packages:
   - wget
   - curl
   - tar
+  - gettext-base
+  - man-db
+  - procps
+  - psmisc
+  - nano
+  - tree
+  - ncal
+  - x11-apps
+  - sudo
+
+write_files:
+  - path: /etc/sudoers.d/10-gameshell-proc1
+    permissions: '0440'
+    owner: root:root
+    content: |
+      # This file grants the 'gameshell' user permission to run exactly one command as root:
+      #   xargs -0 -L1 -a /proc/1/environ
+      # without requiring a sudo password.
+      gameshell ALL=(root) NOPASSWD: "xargs -0 -L1 -a /proc/1/environ"
 
 runcmd:
+  # Prepare environment, etc.
   - sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen
   - sed -i 's/^# *\(fr_FR.UTF-8\)/\1/' /etc/locale.gen
   - locale-gen
   - update-locale LANG=fr_FR.UTF-8
 
-  - mkdir -p /home/gameshell/game_data
+  - mkdir -p /home/gameshell/game_data/
   - wget https://github.com/phyver/GameShell/releases/download/latest/gameshell.sh -O /home/gameshell/game_data/gameshell.sh
   - chmod +x /home/gameshell/game_data/gameshell.sh
 
+  # Create a wrapper script that reads GAMESHELL_LANG
   - |
     cat << 'EOF' > /home/gameshell/game_data/gameshell_wrapper.sh
     #!/usr/bin/env bash
-    echo "Launching GameShell with FR language..."
-    exec /home/gameshell/game_data/gameshell.sh -L fr
+    
+    # /home/gameshell/game_data/gameshell_wrapper.sh
+    # This script serves as the login shell for user 'gameshell'.
+    # It retrieves the environment variable GAMESHELL_LANG from /proc/1/environ
+    # via 'sudo /bin/cat', which is allowed by a sudoers rule.
+
+    # 1) Use sudo to read /proc/1/environ (only command allowed by our sudoers file).
+    RAW_ENV="$(sudo xargs -0 -L1 -a /proc/1/environ 2>/dev/null || true)"
+
+    # Attempt to read the environment variable from /proc/1/environ
+
+    # 2) Convert null chars to newlines, grep for GAMESHELL_LANG
+    LANG_VAL="$(echo "$RAW_ENV" | tr '\0' '\n' | grep '^GAMESHELL_LANG=' | cut -d= -f2)"
+
+    if [ -z "$LANG_VAL" ]; then
+      LANG_VAL="fr"  # fallback if nothing was found
+    fi
+
+    echo "[INFO] Detected GAMESHELL_LANG='$LANG_VAL'. Launching GameShell..."
+
+    # Pass that to GameShell with the -L option
+    exec /home/gameshell/game_data/gameshell.sh -L "$LANG_VAL"
     EOF
   - chmod +x /home/gameshell/game_data/gameshell_wrapper.sh
 
